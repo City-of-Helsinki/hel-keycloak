@@ -1,4 +1,5 @@
-# hel-keycloak
+# hel-keycloak-deployment
+
 Repository for setting up Keycloak as helsinki-tunnistus component.
 
 helsinki-tunnistus is planned to be a service enabling two functions of Helsinki Profile:
