@@ -1,0 +1,4 @@
+# ansible.cfg directs these to roles/external
+
+# Docker installation
+- src: geerlingguy.docker

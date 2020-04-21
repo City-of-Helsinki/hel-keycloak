@@ -1,0 +1,16 @@
+---
+# This is for inclusion within loop
+- name: Check if client definition already exists
+  command: "{{ keycloak_bin_path }}/kcadm.sh get clients -r {{ keycloak_realm_config['realm'] }} -q clientId={{ item['clientId'] }}"
+  register: _kc_client_def_output
+
+- debug: var=item
+
+- name: Ensure client definition exists
+  command: "{{ keycloak_bin_path }}/kcadm.sh create clients -r {{ keycloak_realm_config['realm'] }} -s clientId={{ item['clientId'] }} -s id={{ item['id'] }}"
+  ignore_errors: True
+
+- name: Update client definition to match config
+  command: "{{ keycloak_bin_path }}/kcadm.sh update clients/{{ item['id'] }} -r {{ keycloak_realm_config['realm'] }} -f -"
+  args:
+    stdin: "{{ item | to_json }}"

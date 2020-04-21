@@ -1,0 +1,12 @@
+---
+- name: Ensure pip is available
+  apt:
+    name: "python3-pip"
+    state: present
+
+- name: Ensure psycopg2 is available
+  become: yes
+  apt: name={{ packages }} state=present update_cache=yes
+  vars:
+    packages:
+      - python3-psycopg2

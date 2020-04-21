@@ -1,0 +1,32 @@
+---
+- name: Load local vars if defined
+  when: local_vars_file is file
+  include_vars: "{{ local_vars_file }}"
+
+- fail:
+    msg: keycloak_bin_path must be set to 
+  when: keycloak_bin_path is not defined
+
+# TODO, use this as loop source
+- name: Set config particles as facts
+  set_fact:
+    realm_config: "{{ keycloak_realm_config | to_json }}"
+
+- name: Ensure realm exists
+  command: "{{ keycloak_bin_path }}/kcadm.sh create realms -s realm={{ keycloak_realm_config['realm'] }}"
+  # Unfortunately there does not seem to be way to make the command succeed even if the realm already exists
+  ignore_errors: True
+
+- name: Ensure realm configuration is as defined
+  command: "{{ keycloak_bin_path }}/kcadm.sh update realms/{{ keycloak_realm_config['realm'] }} -f -"
+  args:
+    # Ansible will happily re-parse the json, and then force coerce
+    # it to python repr string, unless | string filter is used
+    stdin: "{{ realm_config | string }}"
+
+- set_fact:
+    _keycloak_client_def: "{{ keycloak_clients[0] }}"
+
+- name: Set up client definitions
+  include_tasks: client_config_tasks.yml
+  loop: "{{ keycloak_clients }}"

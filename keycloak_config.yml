@@ -1,0 +1,56 @@
+# Configuration can be run from the controller, unless the controller
+# does not have access to the keycloak management endpoints
+- hosts: localhost
+  vars:
+    # local_vars.yml should contain the location of kcadm script
+    local_vars_file: "{{ lookup('first_found', 'local_vars.yml', errors='ignore') }}"
+    keycloak_admin_pw: "4IdVwfO8o8RHwcL72MVK"
+    keycloak_realm_config:
+      # Arbitrary UUID
+      #id: "8e1e56b2-f238-49ab-9100-2a5e3c7c3b68"
+      realm: "keycloak-test"
+      displayName: "Keycloak-test"
+      displayNameHtml: "Keycloak-test"
+      enabled: "true"
+      registrationAllowed: "true"
+      registrationEmailAsUsername: "true"
+      resetPasswordAllowed: "true"
+      # You will need an SMTP configuration to verify emails, commented
+      # out below. Fill in the blanks.
+      verifyEmail: "false"
+      rememberMe: "false"
+      #smtpServer:
+      #  starttls: "true"
+      #  auth: "true"
+      #  port: "your-smtp-server-port-here"
+      #  host: "your-smtp-server-fqdn-here"
+      #  from: "mail-sender-address-here"
+      #  fromDisplayName: "Keycloak-test-instance"
+      #  user: "smtp-username-here"
+      #  password: "smtp-password-here"
+    keycloak_clients:
+    # This is a happy test client for authorization code flow
+    # enabled by setting ´"standardFlowEnabled"
+      # Arbitrary UUID too
+      - id: a49672d6-99f5-4fdb-8f68-93a954679793
+        clientId: test-client
+        name: Test client for development
+        description: As it says on the tin
+        bearerOnly: false
+        clientAuthenticatorType: client-secret
+        consentRequired: false
+        standardFlowEnabled: true
+        directAccessGrantsEnabled: false
+        implicitFlowEnabled: false
+        enabled: true
+        frontchannelLogout: false
+        fullScopeAllowed: true
+        protocol: openid-connect
+        publicClient: false
+        # Change this per your setup
+        redirectUris:
+        - http://localhost:8000/accounts/keycloak/callback
+        serviceAccountsEnabled: false
+  roles:
+  - role: keycloak-config
+    tags: config

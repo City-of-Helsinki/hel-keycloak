@@ -1,0 +1,3 @@
+---
+# Do not publish any ports from the Keycloak container by default
+keycloak_published_ports: []

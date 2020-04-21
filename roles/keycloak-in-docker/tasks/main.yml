@@ -1,0 +1,66 @@
+---
+- name: Run Debian specific setup tasks
+  include_tasks: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure docker Python API is available
+  pip:
+    name: "docker"
+    state: present
+
+- name: Ensure the shared network exists
+  docker_network:
+    name: keycloak
+
+- name: Ensure database is running
+  docker_container:
+    name: "{{ keycloak_database_instance }}"
+    image: "postgres:10.10"
+    state: started
+    # recreate: yes
+    env:
+      POSTGRES_USER: "{{ keycloak_database_user }}"
+      POSTGRES_PASSWORD: "{{ keycloak_database_password }}"
+      POSTGRES_DB: "{{ keycloak_database_name }}"
+      PGDATA: /srv/postgres
+    # Remove ephemeral volumes on stopping
+    keep_volumes: no
+    # use our own network
+    network_mode: bridge
+    networks:
+      - name: keycloak
+    # Postgres data location on host
+    volumes:
+      - "{{ keycloak_pg_data_path }}:/srv/postgres"
+  register: database_host
+
+- set_fact:
+    postgres_container_ip: "{{ database_host.container.NetworkSettings.Networks.keycloak.IPAddress }}"
+
+- name: Debug postgres_container_ip
+  debug: var=postgres_container_ip
+
+- name: Ensure keycloak is running and inject initial password config
+  docker_container:
+    name: "{{ keycloak_instance_name }}"
+    image: "jboss/keycloak"
+    state: started
+    # recreate: yes
+    # Remove ephemeral volumes on stopping
+    keep_volumes: no
+    network_mode: bridge
+    volumes:
+      - /etc/ssl/certs:/srv/certs:ro
+    networks:
+      - name: keycloak
+    published_ports: "{{ keycloak_published_ports }}"
+    env:
+      KEYCLOAK_USER: "{{ keycloak_initial_admin_name }}"
+      KEYCLOAK_PASSWORD: "{{ keycloak_initial_admin_pw }}"
+      DB_VENDOR: postgres
+      DB_ADDR: "{{ keycloak_database_instance }}"
+      DB_DATABASE: "{{ keycloak_database_name }}"
+      DB_USER: "{{ keycloak_database_user }}"
+      DB_PASSWORD: "{{ keycloak_database_password }}"
+      X509_CA_BUNDLE: /srv/certs
+  register: result
