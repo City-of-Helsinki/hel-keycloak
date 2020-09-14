@@ -34,7 +34,7 @@ Then add the path the `bin` directory within the extracted files to
 
 Then get the necessary tokens for administerin' keycloak:
 
-`/usr/local/keycloak-9.0.3/bin/kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user admin`
+`/usr/local/keycloak-9.0.3/bin/kcadm.sh config credentials --server http://localhost:9080/auth --realm master --user admin`
 
 Enter the `keycloak_initial_admin_pw` from `keycloak_install.yml`
 
