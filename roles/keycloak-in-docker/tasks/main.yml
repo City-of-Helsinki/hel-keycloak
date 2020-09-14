@@ -64,3 +64,6 @@
       DB_PASSWORD: "{{ keycloak_database_password }}"
       X509_CA_BUNDLE: /srv/certs
   register: result
+
+- name: Copy container's keycloak/bin to the host
+  shell: docker cp keycloak_test:/opt/jboss/keycloak/bin ./bin
