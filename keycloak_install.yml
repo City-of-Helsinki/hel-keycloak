@@ -15,7 +15,7 @@
     keycloak_database_password: 2zmSUUoHc5DnsPoj6Lia
     # Publish the ports for local test usage
     keycloak_published_ports:
-      - 8080:8080
-      - 8443:8443
+      - 9080:8080
+      - 9443:8443
   roles:
   - role: keycloak-in-docker

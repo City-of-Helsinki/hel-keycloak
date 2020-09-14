@@ -19,22 +19,17 @@ This requires a functioning docker install:
 `ansible-playbook -i local.inventory keycloak_install.yml`
 
 Look inside keycloak_install.yml to see the default password for
-"admin"-user.
+"admin"-user (4IdVwfO8o8RHwcL72MVK).
 
 # Configure keycloak using REST API
 
-First you will need keycloak CLI client available on your local node.
-Easiest way to get it is to download the whole "Standalone server
-distribution": https://www.keycloak.org/downloads
+The keycloak CLI client will be available on your local under ./bin.
+This folder is copied from the docker container /opt/jboss/keycloak/bin folder.
 
-Then add the path the `bin` directory within the extracted files to
-`local_vars.yml`. For example:
-
-`keycloak_bin_path: /usr/local/keycloak-9.0.3/bin`
 
 Then get the necessary tokens for administerin' keycloak:
 
-`/usr/local/keycloak-9.0.3/bin/kcadm.sh config credentials --server http://localhost:9080/auth --realm master --user admin`
+`./bin/kcadm.sh config credentials --server http://localhost:9080/auth --realm master --user admin`
 
 Enter the `keycloak_initial_admin_pw` from `keycloak_install.yml`
 
