@@ -7,6 +7,9 @@
     msg: keycloak_bin_path must be set to 
   when: keycloak_bin_path is not defined
 
+- name: Authenticate the CLI
+  command: "{{ keycloak_bin_path }}/kcadm.sh config credentials --server http://localhost:9080/auth --realm master --user admin --password {{ keycloak_admin_pw  }}"
+
 # TODO, use this as loop source
 - name: Set config particles as facts
   set_fact:
