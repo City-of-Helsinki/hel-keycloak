@@ -36,3 +36,13 @@ Enter the `keycloak_initial_admin_pw` from `keycloak_install.yml`
 Thereafter you can setup an example configuration using:
 
 `ansible-playbook -i local.inventory keycloak_config.yml`
+
+# Container management
+Stop all containers:
+`docker container stop $(docker container ls -q -f name=keycloak_test)`
+
+Remove all containers:
+`docker container rm -v $(docker ps -aq -f name=keycloak_test)`
+
+Remove the database volume
+`docker volume rm keycloak_test_database`
