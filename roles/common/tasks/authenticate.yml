@@ -1,0 +1,7 @@
+# Gets an authentication token
+
+- name: Load local variables 
+  include_tasks: load_local_vars.yml
+
+- name: Authenticate the CLI
+  command: "{{ keycloak_bin_path }}/kcadm.sh config credentials --server http://localhost:9080/auth --realm master --user {{ keycloak.admin.user }} --password {{ keycloak.admin.password  }}"

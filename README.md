@@ -10,6 +10,11 @@ Most of the user data and authorization information for the tokens would be kept
 
 This repository will probably contain automation necessary to install Keycloak and any extensions necessary for implementing helsinki-tunnistus service.
 
+## Requirements
+This ansible playbook requires jmespath python package to run json queries. Install it with the command below
+
+`pip install jmespath`
+
 ## Usage
 
 # Setup keycloak on localhost
@@ -46,3 +51,5 @@ Remove all containers:
 
 Remove the database volume
 `docker volume rm keycloak_test_database`
+
+

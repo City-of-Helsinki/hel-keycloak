@@ -1,0 +1,8 @@
+keycloak:
+  admin:
+    user: "admin"
+    password: "4IdVwfO8o8RHwcL72MVK"
+  realms:
+    - name: "keycloak-test"
+      clients: # List of clientIds to configure for this realm
+        - test-client

@@ -4,8 +4,8 @@
     name: common
     tasks_from: authenticate.yml
 
-- name: Configure realms
-  include_tasks: realm_config.yml
+- name: Export realms
+  include_tasks: realm_export.yml
   loop: "{{keycloak.realms }}"   
   loop_control:
     loop_var: realm
