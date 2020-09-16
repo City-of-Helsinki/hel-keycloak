@@ -4,18 +4,5 @@
   vars_files:
   tags:
     - install
-  vars:
-    keycloak_instance_name: "keycloak_test"
-    keycloak_initial_admin_name: admin
-    keycloak_initial_admin_pw: 4IdVwfO8o8RHwcL72MVK
-
-    keycloak_database_instance: "keycloak_test_db"
-    keycloak_database_name: "keycloak_test"
-    keycloak_database_user: "keycloak_test"
-    keycloak_database_password: 2zmSUUoHc5DnsPoj6Lia
-    # Publish the ports for local test usage
-    keycloak_published_ports:
-      - 9080:8080
-      - 9443:8443
   roles:
   - role: keycloak-in-docker
