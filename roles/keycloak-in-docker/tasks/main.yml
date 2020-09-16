@@ -14,14 +14,14 @@
 
 - name: Ensure database is running
   docker_container:
-    name: "{{ keycloak_database_instance }}"
+    name: "{{ keycloak.database.instance }}"
     image: "postgres:10.10"
     state: started
     # recreate: yes
     env:
-      POSTGRES_USER: "{{ keycloak_database_user }}"
-      POSTGRES_PASSWORD: "{{ keycloak_database_password }}"
-      POSTGRES_DB: "{{ keycloak_database_name }}"
+      POSTGRES_USER: "{{ keycloak.database.user }}"
+      POSTGRES_PASSWORD: "{{ keycloak.database.password }}"
+      POSTGRES_DB: "{{ keycloak.database.name }}"
       PGDATA: /srv/postgres
     # Remove ephemeral volumes on stopping
     keep_volumes: no
@@ -42,7 +42,7 @@
 
 - name: Ensure keycloak is running and inject initial password config
   docker_container:
-    name: "{{ keycloak_instance_name }}"
+    name: "{{ keycloak.instance.name }}"
     image: "jboss/keycloak"
     state: started
     # recreate: yes
@@ -53,15 +53,15 @@
       - /etc/ssl/certs:/srv/certs:ro
     networks:
       - name: keycloak
-    published_ports: "{{ keycloak_published_ports }}"
+    published_ports: "{{ keycloak.published_ports }}"
     env:
-      KEYCLOAK_USER: "{{ keycloak_initial_admin_name }}"
-      KEYCLOAK_PASSWORD: "{{ keycloak_initial_admin_pw }}"
+      KEYCLOAK_USER: "{{ keycloak.admin.user }}"
+      KEYCLOAK_PASSWORD: "{{ keycloak.admin.password }}"
       DB_VENDOR: postgres
-      DB_ADDR: "{{ keycloak_database_instance }}"
-      DB_DATABASE: "{{ keycloak_database_name }}"
-      DB_USER: "{{ keycloak_database_user }}"
-      DB_PASSWORD: "{{ keycloak_database_password }}"
+      DB_ADDR: "{{ keycloak.database.instance }}"
+      DB_DATABASE: "{{ keycloak.database.name }}"
+      DB_USER: "{{ keycloak.database.user }}"
+      DB_PASSWORD: "{{ keycloak.database.password }}"
       X509_CA_BUNDLE: /srv/certs
   register: result
 

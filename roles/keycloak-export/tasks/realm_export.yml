@@ -1,0 +1,27 @@
+- name: Print realm name
+  debug:
+    msg: "Exporting realm {{ realm.name }}"
+
+- name: Export realm configuration
+  command: "{{ keycloak_bin_path }}/kcadm.sh get realms/{{ realm.name }} "
+  register: realm_export
+
+- set_fact:
+    realmConfig: "{{ realm_export.stdout | from_json }}"
+
+- name: Write role to file
+  local_action: copy content={{ ( realmConfig | to_nice_json(indent=2)) }} dest=./roles/shared/{{ realm.name }}-realm.json
+
+- name: Get client ids
+  command: "{{ keycloak_bin_path }}/kcadm.sh get clients -r {{realm.name}} --fields id,clientId"
+  register: get_client_response
+
+- name: Set clientIds json
+  set_fact:
+    clients_json: "{{ get_client_response.stdout | from_json }}"
+
+- name: Export clients
+  include_tasks: client_export.yml
+  loop: "{{ realm.clients }}"
+  loop_control:
+    loop_var: client

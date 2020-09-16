@@ -1,0 +1,9 @@
+---
+- name: Load local vars if defined
+  when: local_vars_file is file
+  include_vars: "{{ local_vars_file }}"
+
+- name: Fail if keycloak_bin_path is undefined
+  fail:
+    msg: keycloak_bin_path must be configured
+  when: keycloak_bin_path is not defined

@@ -1,9 +1,9 @@
 # Configuration can be run from the controller, unless the controller
 # does not have access to the keycloak management endpoints
-- hosts: localhost
+- hosts: keycloak_servers
   vars:
     # local_vars.yml should contain the location of kcadm script
     local_vars_file: "{{ lookup('first_found', 'local_vars.yml', errors='ignore') }}"
   roles:
-  - role: keycloak-config
+  - role: keycloak-export
     tags: config
