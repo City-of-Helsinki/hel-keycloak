@@ -1,0 +1,37 @@
+---
+- name: Print realm name
+  debug:
+    msg: "Configuring realm {{ realm.name }}"
+
+- name: Get realms
+  command: "{{ keycloak_bin_path }}/kcadm.sh get  realms -F realm"
+  register: realms_json
+
+- name: "Set fact isRealDefined for realm {{ realm.name }}"
+  set_fact:
+    isRealDefined: "{{ (realms_json.stdout | from_json) | json_query(realm_query)  }}"
+  vars:
+    realm_query: "contains([*].realm,`{{ realm.name }}`)"
+
+- name: "Is realm {{ realm.name }} already configured?" 
+  debug:
+    msg: "Is realm {{ realm.name }} already configured?: {{ isRealDefined }}"    
+
+- name: Create realm
+  command: "{{ keycloak_bin_path }}/kcadm.sh create realms -f ./roles/shared/{{ realm.name }}-realm.json"
+  when: not isRealDefined
+
+- name: Update existing realm with the latest version
+  command: "{{ keycloak_bin_path }}/kcadm.sh update realms/{{ realm.name }} -f ./roles/shared/{{ realm.name }}-realm.json"
+  when: isRealDefined
+
+- name: Print clients
+  debug:
+    msg: "Configuring clients {{ realm.clients }}"
+
+
+- name: Configure clients
+  include_tasks: client_config_tasks.yml
+  loop: "{{ realm.clients }}"
+  loop_control:
+    loop_var: client

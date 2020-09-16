@@ -1,16 +1,36 @@
 ---
 # This is for inclusion within loop
+- name: print vars
+  debug:
+    var:  client
+
+- name: Set client configuration path
+  set_fact:
+    client_config_filename: "./roles/shared/{{ realm.name }}-{{client}}-client.json"
+
+- name: print 
+  debug:
+    msg: "this is the var {{ client_config_filename }}"
+
+- name: Read the client config file
+  include_vars: 
+    file: "{{ client_config_filename }}"
+    name: client_config_json
+
+- name: Print client config file
+  debug:
+    var: client_config_json.id 
+
 - name: Check if client definition already exists
-  command: "{{ keycloak_bin_path }}/kcadm.sh get clients -r {{ keycloak_realm_config['realm'] }} -q clientId={{ item['clientId'] }}"
-  register: _kc_client_def_output
-
-- debug: var=item
-
-- name: Ensure client definition exists
-  command: "{{ keycloak_bin_path }}/kcadm.sh create clients -r {{ keycloak_realm_config['realm'] }} -s clientId={{ item['clientId'] }} -s id={{ item['id'] }}"
+  command: "{{ keycloak_bin_path }}/kcadm.sh get clients/{{ client_config_json.id }} -r {{ realm.name }}"
+  register: get_client_response
   ignore_errors: True
 
-- name: Update client definition to match config
-  command: "{{ keycloak_bin_path }}/kcadm.sh update clients/{{ item['id'] }} -r {{ keycloak_realm_config['realm'] }} -f -"
-  args:
-    stdin: "{{ item | to_json }}"
+
+- name: Create client
+  command: "{{ keycloak_bin_path }}/kcadm.sh create clients -r {{ realm.name }}  -f {{ client_config_filename }}"
+  when: get_client_response.rc != 0
+
+- name: Update client
+  command: "{{ keycloak_bin_path }}/kcadm.sh update clients/{{ client_config_json.id }} -r {{ realm.name }}  -f {{ client_config_filename }}"
+  when: get_client_response.rc == 0

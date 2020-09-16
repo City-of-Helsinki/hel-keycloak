@@ -1,0 +1,13 @@
+- name: Print realm name
+  debug:
+    msg: "Exporting realm {{ realm.name }}"
+
+- name: Export realm configuration
+  command: "{{ keycloak_bin_path }}/kcadm.sh get realms/{{ realm.name }} "
+  register: realm_export
+
+- set_fact:
+    realmConfig: "{{ realm_export.stdout | from_json }}"
+
+- name: Write role to file
+  local_action: copy content={{ ( realmConfig | to_nice_json(indent=2)) }} dest=./roles/shared/{{ realm.name }}-realm.json
