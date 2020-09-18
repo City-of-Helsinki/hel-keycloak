@@ -1,0 +1,7 @@
+- hosts: keycloak_servers
+  tasks:
+  - name: Purge all
+    include_role: 
+      name: keycloak-in-docker 
+      tasks_from: purge.yml
+ 

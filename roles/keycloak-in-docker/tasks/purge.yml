@@ -1,0 +1,25 @@
+- name: Stop the keycloak container
+  docker_container:
+    name:  "{{ keycloak.instance.name }}"
+    state: stopped
+
+- name: Stop the database container
+  docker_container:
+    name:  "{{ keycloak.database.instance }}"
+    state: stopped
+
+- name: Remove the keycloak container
+  docker_container:
+    name:  "{{ keycloak.instance.name }}"
+    state: absent
+
+- name: Remove the database container
+  docker_container:
+    name:  "{{ keycloak.database.instance }}"
+    state: absent
+    keep_volumes: no
+
+- name: Remove the database volume
+  docker_volume:
+    name: "{{ keycloak_pg_data_path }}"
+    state: absent

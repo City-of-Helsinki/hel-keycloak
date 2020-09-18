@@ -1,0 +1,38 @@
+all:
+  children:
+    keycloak_servers:
+      hosts:
+        localhost:
+          ansible_connection: local
+          keycloak_pg_data_path: keycloak_test_database
+  vars:
+    keycloak:
+      admin:
+        user: "admin"
+        password: "4IdVwfO8o8RHwcL72MVK"
+      realms:
+        - name: "keycloak-test"
+          clients: # List of clientIds to configure for this realm
+            - name: test-client
+            - name: realm-management
+              skip_configuration: yes # Will not look for a json file to configure this default client
+              roles:
+                - name: "user-admins-role"
+                  description: "This is a test composite role"
+                  composite_roles:
+                    - view-users
+                    - query-users
+                    - query-groups
+                    - manage-users
+      instance:
+        name: "keycloak_test"
+      database:
+        instance: "keycloak_test_db"
+        name: "keycloak_test"
+        user: "keycloak_test"
+        password: 2zmSUUoHc5DnsPoj6Lia
+      # Publish the ports for local test usage
+      published_ports:
+        - 9080:8080
+        - 9443:8443    
+      config_dir: "./roles/config/local"

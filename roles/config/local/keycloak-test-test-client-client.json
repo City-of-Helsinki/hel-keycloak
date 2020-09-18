@@ -1,0 +1,46 @@
+{
+  "access": {
+    "configure": true,
+    "manage": true,
+    "view": true
+  },
+  "alwaysDisplayInConsole": false,
+  "attributes": {},
+  "authenticationFlowBindingOverrides": {},
+  "bearerOnly": false,
+  "clientAuthenticatorType": "client-secret",
+  "clientId": "test-client",
+  "consentRequired": false,
+  "defaultClientScopes": [
+    "web-origins",
+    "role_list",
+    "roles",
+    "profile",
+    "email"
+  ],
+  "description": "As it says on the tin",
+  "directAccessGrantsEnabled": false,
+  "enabled": true,
+  "frontchannelLogout": false,
+  "fullScopeAllowed": true,
+  "id": "a49672d6-99f5-4fdb-8f68-93a954679793",
+  "implicitFlowEnabled": false,
+  "name": "Test client for development",
+  "nodeReRegistrationTimeout": -1,
+  "notBefore": 0,
+  "optionalClientScopes": [
+    "address",
+    "phone",
+    "offline_access",
+    "microprofile-jwt"
+  ],
+  "protocol": "openid-connect",
+  "publicClient": false,
+  "redirectUris": [
+    "http://localhost:8000/accounts/keycloak/callback"
+  ],
+  "serviceAccountsEnabled": false,
+  "standardFlowEnabled": true,
+  "surrogateAuthRequired": false,
+  "webOrigins": []
+}

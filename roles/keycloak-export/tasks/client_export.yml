@@ -1,0 +1,24 @@
+- name: Print client name
+  debug:
+    msg: "Exporting client {{client}} configuration"
+
+- name: Set clientId
+  set_fact:
+    clientId: "{{ (clients_json) | json_query(clientId_query) }}"
+  vars:
+    clientId_query: "([?clientId=='{{client}}'].id)[0]"
+
+- name: Get the individual client configuration
+  command: "{{ keycloak_bin_path }}/kcadm.sh get  clients/{{clientId}} -r {{realm.name}}"
+  register: client_export
+
+- name: Store configuration response into a variable
+  set_fact:
+    client_config_export: "{{ client_export.stdout | from_json }}"
+
+- name: Set client configuration path
+  set_fact:
+    client_config_filename: "{{keycloak.config_dir}}/{{ realm.name }}-{{client}}-client.json"
+
+- name: Write client config to file
+  local_action: copy content={{ ( client_config_export | to_nice_json(indent=2)) }} dest={{client_config_filename}}

@@ -10,39 +10,59 @@ Most of the user data and authorization information for the tokens would be kept
 
 This repository will probably contain automation necessary to install Keycloak and any extensions necessary for implementing helsinki-tunnistus service.
 
-## Usage
+## Requirements
+This ansible playbook requires jmespath python package to run json queries. Install it with the command below
 
-# Setup keycloak on localhost
+    pip install jmespath
+
+# Usage
+
+## Setup keycloak on localhost
 
 This requires a functioning docker install:
 
-`ansible-playbook -i local.inventory keycloak_install.yml`
+    ansible-playbook -i inventory/local.yml keycloak_install.yml
 
-Look inside keycloak_install.yml to see the default password for
-"admin"-user (4IdVwfO8o8RHwcL72MVK).
+The keycloak admin is defined in the inventory  (admin/4IdVwfO8o8RHwcL72MVK).
 
-# Configure keycloak using REST API
+## Configure keycloak using REST API
+
+Make sure to wait until the keycloak is available before running the configuration.
+    
+    docker logs keycloak_test --follow
+
+Wait for a message like:
+
+    10:31:51,870 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0051: Admin console listening on http://127.0.0.1:9990
 
 The keycloak CLI client will be available on your local under ./bin.
 This folder is copied from the docker container /opt/jboss/keycloak/bin folder.
 
-
-Then get the necessary tokens for administerin' keycloak:
-
-`./bin/kcadm.sh config credentials --server http://localhost:9080/auth --realm master --user admin`
-
-Enter the `keycloak_initial_admin_pw` from `keycloak_install.yml`
-
 Thereafter you can setup an example configuration using:
 
-`ansible-playbook -i local.inventory keycloak_config.yml`
+    ansible-playbook -i inventory/local.yml keycloak_config.yml
 
-# Container management
+## Container management
+You can remove the keycloak and database container as well as the database volume with the command:
+
+    ansible-playbook -i inventory/local.yml keycloak_purge.yml
+
+### Manual container management
+
 Stop all containers:
-`docker container stop $(docker container ls -q -f name=keycloak_test)`
+
+    docker container stop $(docker container ls -q -f name=keycloak_test)
 
 Remove all containers:
-`docker container rm -v $(docker ps -aq -f name=keycloak_test)`
+
+    docker container rm -v $(docker ps -aq -f name=keycloak_test)
 
 Remove the database volume
-`docker volume rm keycloak_test_database`
+
+    docker volume rm keycloak_test_database
+
+
+## Adding configurations
+- Create realms and clients using the keycloak admin console GUI
+- Add realm and clients definitions to the group_vars/keycloak_servers
+- Run ansible-playbook -i inventory/local.yml keycloak_export.yml. The files are stored under ./roles/shared
