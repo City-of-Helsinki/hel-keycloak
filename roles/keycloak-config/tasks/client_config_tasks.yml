@@ -6,7 +6,7 @@
 
 - name: Set client configuration path
   set_fact:
-    client_config_filename: "./roles/shared/{{ realm.name }}-{{client}}-client.json"
+    client_config_filename: "./roles/shared/{{ realm.name }}-{{client.name}}-client.json"
 
 - name: print 
   debug:

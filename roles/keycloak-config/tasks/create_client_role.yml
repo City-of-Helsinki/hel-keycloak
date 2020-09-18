@@ -1,0 +1,10 @@
+- name: Print the client name
+  debug:
+    msg: "Creating roles for client {{ client.name }}"
+
+- name: Create composite roles
+  include_tasks: create_composite_role.yml
+  loop: "{{ client.roles }}"
+  loop_control:
+    loop_var: role
+  when: client.roles is defined

@@ -15,27 +15,34 @@ This ansible playbook requires jmespath python package to run json queries. Inst
 
 `pip install jmespath`
 
-## Usage
+# Usage
 
-# Setup keycloak on localhost
+## Setup keycloak on localhost
 
 This requires a functioning docker install:
 
-`ansible-playbook -i local.inventory keycloak_install.yml`
+`ansible-playbook -i inventory/local.yml keycloak_install.yml`
 
-Look inside keycloak_install.yml to see the default password for
-"admin"-user (4IdVwfO8o8RHwcL72MVK).
+The keycloak admin is defined in the inventory  (admin/4IdVwfO8o8RHwcL72MVK).
 
-# Configure keycloak using REST API
+## Configure keycloak using REST API
+
+Make sure to wait until the keycloak is available before running the configuration.
+`docker logs keycloak_test --follow`
 
 The keycloak CLI client will be available on your local under ./bin.
 This folder is copied from the docker container /opt/jboss/keycloak/bin folder.
 
 Thereafter you can setup an example configuration using:
 
-`ansible-playbook -i local.inventory keycloak_config.yml`
+`ansible-playbook -i inventory/local.yml keycloak_config.yml`
 
-# Container management
+## Container management
+You can remove the keycloak and database container as well as the database volume with the command:
+`ansible-playbook -i inventory/local.yml keycloak_purge.yml`
+
+You can alternatively run the commands manually
+
 Stop all containers:
 `docker container stop $(docker container ls -q -f name=keycloak_test)`
 
@@ -46,7 +53,7 @@ Remove the database volume
 `docker volume rm keycloak_test_database`
 
 
-# Adding configurations
+## Adding configurations
 - Create realms and clients using the keycloak admin console GUI
 - Add realm and clients definitions to the group_vars/keycloak_servers
-- Run `ansible-playbook -i local.inventory keycloak_export.yml`. The files are stored under `./roles/shared`
+- Run `ansible-playbook -i inventory/local.yml keycloak_export.yml`. The files are stored under `./roles/shared`

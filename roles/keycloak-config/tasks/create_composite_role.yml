@@ -1,0 +1,49 @@
+---
+
+- name: Print realm name
+  debug:
+    var: realm.name
+
+- name: Get the client id where the role will be created
+  command: "{{ keycloak_bin_path }}/kcadm.sh get clients -r {{realm.name}} --fields id,clientId"
+  register: response
+
+- name: Set clientId
+  set_fact:
+    clientId: "{{ (response.stdout | from_json) | json_query(clientId_query) }}"
+  vars:
+    clientId_query: "([?clientId=='{{client.name}}'].id)[0]"
+  no_log: True
+
+- name: Print response
+  debug:
+    var: clientId
+
+- name: Check if the role exists already
+  command: "{{ keycloak_bin_path }}/kcadm.sh get-roles -r {{realm.name}} --cclientid {{client.name}} --rolename {{role.name}}"
+  ignore_errors: True
+  register: role_exists_response
+  failed_when: role_exists_response.rc < 0
+
+- set_fact:
+    role_exists: "{{role_exists_response.rc == 0 }}"
+    
+- name: Delete role if exists
+  command: "{{ keycloak_bin_path }}/kcadm.sh delete clients/{{clientId}}/roles/{{role.name}} -r {{realm.name}}" 
+  when: role_exists
+  register: result
+
+- name: Create role
+  command: "{{ keycloak_bin_path }}/kcadm.sh create clients/{{clientId}}/roles -r {{realm.name}} -s name={{role.name}} -s 'description={{role.description}}'"
+  register: result
+
+- name: Get the role id we just created
+  command: "{{ keycloak_bin_path }}/kcadm.sh get-roles -r {{realm.name}} --cclientid {{client.name}} --rolename {{role.name}}"
+  register: result
+
+- set_fact:
+    composite_roles_args: "{{ role.composite_roles | map('regex_replace', '^(.*)$', '--rolename \\1' ) | join(' ') }}" 
+
+- name: Add roles to the composite role
+  command: "{{ keycloak_bin_path }}/kcadm.sh add-roles -r {{realm.name}} --cclientid {{client.name}} --rid {{(result.stdout |from_json).id }}  {{composite_roles_args}}"
+  register: result

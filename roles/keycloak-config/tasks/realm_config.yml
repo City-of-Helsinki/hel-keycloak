@@ -13,9 +13,9 @@
   vars:
     realm_query: "contains([*].realm,`{{ realm.name }}`)"
 
-- name: "Is realm {{ realm.name }} already configured?" 
+- name: "Is the realm already created?" 
   debug:
-    msg: "Is realm {{ realm.name }} already configured?: {{ isRealDefined }}"    
+    msg: "Is the realm {{ realm.name }} already created?: {{ isRealDefined }}"    
 
 - name: Create realm
   command: "{{ keycloak_bin_path }}/kcadm.sh create realms -f ./roles/shared/{{ realm.name }}-realm.json"
@@ -25,13 +25,16 @@
   command: "{{ keycloak_bin_path }}/kcadm.sh update realms/{{ realm.name }} -f ./roles/shared/{{ realm.name }}-realm.json"
   when: isRealDefined
 
-- name: Print clients
-  debug:
-    msg: "Configuring clients {{ realm.clients }}"
-
-
 - name: Configure clients
   include_tasks: client_config_tasks.yml
+  loop: "{{ realm.clients }}"
+  loop_control:
+    loop_var: client
+  when: client.skip_configuration is not defined
+
+# Roles might depend on other clients. Configure after all clients have been instantiated.
+- name: Create client composite role
+  include_tasks: create_client_role.yml 
   loop: "{{ realm.clients }}"
   loop_control:
     loop_var: client
