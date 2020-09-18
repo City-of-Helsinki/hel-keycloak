@@ -6,7 +6,7 @@
 
 - name: Set client configuration path
   set_fact:
-    client_config_filename: "./roles/shared/{{ realm.name }}-{{client.name}}-client.json"
+    client_config_filename: "{{keycloak.config_dir}}/{{ realm.name }}-{{client.name}}-client.json"
 
 - name: print 
   debug:
@@ -25,6 +25,7 @@
   command: "{{ keycloak_bin_path }}/kcadm.sh get clients/{{ client_config_json.id }} -r {{ realm.name }}"
   register: get_client_response
   ignore_errors: True
+  failed_when: get_client_response.rc < 0
 
 
 - name: Create client

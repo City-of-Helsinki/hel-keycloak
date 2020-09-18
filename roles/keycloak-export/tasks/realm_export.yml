@@ -10,7 +10,7 @@
     realmConfig: "{{ realm_export.stdout | from_json }}"
 
 - name: Write role to file
-  local_action: copy content={{ ( realmConfig | to_nice_json(indent=2)) }} dest=./roles/shared/{{ realm.name }}-realm.json
+  local_action: copy content={{ ( realmConfig | to_nice_json(indent=2)) }} dest={{keycloak.config_dir}}./{{ realm.name }}-realm.json
 
 - name: Get client ids
   command: "{{ keycloak_bin_path }}/kcadm.sh get clients -r {{realm.name}} --fields id,clientId"

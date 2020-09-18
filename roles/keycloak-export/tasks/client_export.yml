@@ -18,7 +18,7 @@
 
 - name: Set client configuration path
   set_fact:
-    client_config_filename: "./roles/shared/{{ realm.name }}-{{client}}-client.json"
+    client_config_filename: "{{keycloak.config_dir}}/{{ realm.name }}-{{client}}-client.json"
 
 - name: Write client config to file
   local_action: copy content={{ ( client_config_export | to_nice_json(indent=2)) }} dest={{client_config_filename}}
